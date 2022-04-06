@@ -4,6 +4,7 @@ import (
 	"log"
 	"vol-backend/global"
 	"vol-backend/initialize"
+	"vol-backend/router"
 )
 
 func main() {
@@ -14,4 +15,6 @@ func main() {
 		return
 	}
 	log.Println(global.VB_DB)
+
+	router.Router()
 }
