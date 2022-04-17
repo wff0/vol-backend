@@ -9,7 +9,8 @@ type EventApply struct {
 	ID          uint
 	EventID     int       `json:"event_id" gorm:"column:event_id"`
 	UserID      int       `json:"user_id" gorm:"column:user_id"`
-	ApplyStatus string    `json:"apply_status" gorm:"column:"` //报名中/报名通过/报名失败
+	ApplyStatus string    `json:"apply_status" gorm:"column:apply_status"` //报名中/报名通过/报名失败
+	Remark      string    `json:"remark" gorm:"column:remark"`             //报名中/报名通过/报名失败
 	CreateTime  time.Time `json:"create_time" gorm:"column:create_time"`
 	UpdateTime  time.Time `json:"update_time" gorm:"column:update_time"`
 }

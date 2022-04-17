@@ -9,7 +9,7 @@ func Router() {
 	r := gin.Default()
 	v1 := r.Group("/v1")
 	{
-		v1.POST("/manager/createEvent", system.CreateEvent)
+		v1.POST("/api/createEvent", system.CreateEvent)
 	}
 
 	r.Run(":8080")
