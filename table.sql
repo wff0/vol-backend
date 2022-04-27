@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `news`
     `id`            int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id',
     `title`         varchar(100)  NOT NULL COMMENT '新闻标题',
     `body`          varchar(2000) NOT NULL COMMENT '新闻主体',
+    `user_id`       int(11) NOT NULL COMMENT '创建者',
     `create_time`   timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`   timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
@@ -43,7 +44,8 @@ CREATE TABLE IF NOT EXISTS `user_info`
     `password`      varchar(100) NOT NULL COMMENT '用户密码',
     `gender`        varchar(100) NOT NULL COMMENT '用户性别',
     `school`        varchar(100) COMMENT '用户学校',
-    `class`         varchar(100) COMMENT '用户班级',
+    `classroom`     varchar(100) COMMENT '用户班级',
+    `role`          int COMMENT '用户角色 1 管理员 2 志愿者',
     `create_time`   timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`   timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`)
