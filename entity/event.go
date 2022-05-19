@@ -11,7 +11,7 @@ type Event struct {
 	Location    string    `json:"location" gorm:"column:location"`
 	UserID      int       `json:"user_id" gorm:"column:user_id"`
 	Description string    `json:"description" gorm:"column:description"`
-	Status      string    `json:"status" gorm:"column:status"` //报名中/进行中/已结束
+	Status      int       `json:"status" gorm:"column:status"` //0 报名中/1 进行中/2 已结束
 	MaxNum      int       `json:"max_num" gorm:"column:max_num"`
 	StartTime   string    `json:"start_time" gorm:"column:start_time"`
 	EndTime     string    `json:"end_time" gorm:"column:end_time"`
@@ -20,7 +20,7 @@ type Event struct {
 }
 
 func CreateEvent(event Event) error {
-	event.Status = "报名中"
+	event.Status = EventSignUp
 	err := global.VB_DB.
 		Table(TABLE_NAME_EVENT).
 		Omit("create_time", "update_time").
@@ -49,7 +49,7 @@ func UpdateEventAll(event Event, id uint) error {
 	return nil
 }
 
-func UpdateEventStatus(id uint, status string) error {
+func UpdateEventStatus(id uint, status int) error {
 	err := global.VB_DB.
 		Table(TABLE_NAME_EVENT).
 		Where("id = ?", id).
@@ -60,9 +60,16 @@ func UpdateEventStatus(id uint, status string) error {
 	return nil
 }
 
-func SelectEventById(id uint) (*Event, error) {
-	var event *Event
-	err := global.VB_DB.Table(TABLE_NAME_EVENT).Where("id = ?", id).Find(&event).Error
+func SelectEventById(id uint) (*EventPackage, error) {
+	var event *EventPackage
+	err := global.VB_DB.
+		Table(TABLE_NAME_EVENT).
+		Select("event.id", "title", "location",
+			"username", "description", "status", "max_num", "start_time", "end_time").
+		Joins("left join user_info on event.user_id = user_info.id").
+		Where("event.id = ?", id).
+		First(&event).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +91,7 @@ type EventPackage struct {
 	Location    string `json:"location"`
 	Username    string `json:"username"`
 	Description string `json:"description"`
-	Status      string `json:"status"` //报名中/进行中/已结束
+	Status      int    `json:"status"` //报名中/进行中/已结束
 	MaxNum      int    `json:"max_num"`
 	StartTime   string `json:"start_time"`
 	EndTime     string `json:"end_time"`
@@ -117,4 +124,19 @@ func GetEventCount() (int64, error) {
 		return 0, nil
 	}
 	return count, nil
+}
+
+func GetAllActivityList() ([]EventPackage, error) {
+	var list []EventPackage
+	err := global.VB_DB.
+		Table(TABLE_NAME_EVENT).
+		Select("event.id", "title", "location",
+			"username", "description", "status", "max_num", "start_time", "end_time").
+		Joins("left join user_info on event.user_id = user_info.id").
+		Find(&list).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
 }

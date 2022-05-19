@@ -25,6 +25,28 @@ func CreateNews(news News) error {
 	return nil
 }
 
+type NewsPackage struct {
+	ID         uint   `json:"id"`
+	Title      string `json:"title"`
+	Body       string `json:"body"`
+	Username   string `json:"username"`
+	CreateTime string `json:"create_time"`
+}
+
+func SelectNewsByID(id uint) (*NewsPackage, error) {
+	news := &NewsPackage{}
+	err := global.VB_DB.
+		Table(TABLE_NAME_NEWS).
+		Select("news.id", "title", "body", "username", "news.create_time").
+		Joins("left join user_info on news.user_id = user_info.id").
+		Where("news.id = ?", id).
+		First(news).Error
+	if err != nil {
+		return nil, err
+	}
+	return news, nil
+}
+
 func UpdateNewsByID(news News, id uint) error {
 	err := global.VB_DB.Table(TABLE_NAME_NEWS).
 		Where("id = ?", id).
@@ -49,21 +71,35 @@ func DeleteNewsByID(id uint) error {
 	return nil
 }
 
-type NewsPackage struct {
+type NewsListPackage struct {
 	ID       uint   `json:"id"`
 	Title    string `json:"title"`
 	Body     string `json:"body"`
 	Username string `json:"username"`
 }
 
-func GetNewsList(page int, pageSize int) ([]NewsPackage, error) {
-	var list []NewsPackage
+func GetNewsList(page int, pageSize int) ([]NewsListPackage, error) {
+	var list []NewsListPackage
 	err := global.VB_DB.
 		Table(TABLE_NAME_NEWS).
 		Select("news.id", "title", "body", "username").
 		Joins("left join user_info on news.user_id = user_info.id").
 		Offset((page - 1) * pageSize).
 		Limit(pageSize).
+		Find(&list).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
+func GetAllNewsList() ([]NewsListPackage, error) {
+	var list []NewsListPackage
+	err := global.VB_DB.
+		Table(TABLE_NAME_NEWS).
+		Select("news.id", "title", "body", "username").
+		Joins("left join user_info on news.user_id = user_info.id").
 		Find(&list).
 		Error
 	if err != nil {

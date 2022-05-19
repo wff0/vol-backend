@@ -45,6 +45,21 @@ func UpdateUserInfoByID(info UserInfo, id uint) error {
 	return nil
 }
 
+func UserUpdateUserInfoByID(info UserInfo, id uint) error {
+	err := global.VB_DB.Table(TABLE_NAME_USER_INFO).
+		Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"username":  info.Username,
+			"password":  info.Password,
+			"school":    info.School,
+			"gender":    info.Gender,
+			"classroom": info.Classroom}).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func DeleteUserByID(id uint) error {
 	var user *UserInfo
 	err := global.VB_DB.
@@ -74,7 +89,7 @@ func GetUserInfoList(page int, pageSize int) ([]UserInfo, error) {
 	var list []UserInfo
 	err := global.VB_DB.
 		Table(TABLE_NAME_USER_INFO).
-		Select("id", "username", "gender", "school", "classroom", "role").
+		Select("id", "username", "password", "gender", "school", "classroom", "role").
 		Offset((page - 1) * pageSize).
 		Limit(pageSize).
 		Find(&list).
@@ -95,4 +110,26 @@ func GetUserCount() (int64, error) {
 		return 0, nil
 	}
 	return count, nil
+}
+
+type UserInfoPackage struct {
+	ID        uint   `json:"id"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Gender    string `json:"gender"`
+	School    string `json:"school"`
+	Classroom string `json:"classroom"`
+}
+
+func GetUserInfoByID(id uint) (*UserInfoPackage, error) {
+	var userInfo *UserInfoPackage
+	err := global.VB_DB.
+		Table(TABLE_NAME_USER_INFO).
+		Where("id = ?", id).
+		First(&userInfo).
+		Error
+	if err != nil {
+		return nil, nil
+	}
+	return userInfo, nil
 }
